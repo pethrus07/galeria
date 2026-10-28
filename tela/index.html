@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galeria · Limpeza</title>
+<style>
+  :root {
+    --fundo: #111214; --cartao: #1a1b1f; --texto: #ececee; --suave: #8b8d94;
+    --linha: #26282d; --acento: #ffb700; --perigo: #ff5a5f; --ok: #4cc38a;
+    --lado: 148px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto);
+         font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--fundo);
+           padding: 20px 32px 0; }
+  .topo { display: flex; align-items: baseline; gap: 24px; }
+  h1 { font-size: 18px; font-weight: 600; margin: 0; }
+  .progresso { color: var(--suave); font-size: 13px; }
+  .barra { height: 2px; background: var(--linha); margin-top: 14px; }
+  .barra > i { display: block; height: 100%; background: var(--acento); width: 0; transition: width .4s; }
+  nav { display: flex; gap: 4px; margin-top: 12px; flex-wrap: wrap; }
+  nav button { background: none; border: 0; color: var(--suave); font: inherit; padding: 8px 14px;
+               border-radius: 8px; cursor: pointer; }
+  nav button:hover { color: var(--texto); }
+  nav button.ativa { color: var(--texto); background: var(--cartao); }
+  nav small { opacity: .6; margin-left: 4px; }
+  nav .mais { margin-left: auto; }
+  main { padding: 28px 32px 140px; max-width: 1500px; }
+  .dica { color: var(--suave); margin: 0 0 24px; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--lado), 1fr)); gap: 6px; }
+  .foto { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; cursor: pointer;
+          background: var(--cartao); outline: 2px solid transparent; outline-offset: -2px; }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .15s; }
+  .foto.fora img { opacity: .5; filter: grayscale(1); }
+  .foto.fora::after { content: "✕"; position: absolute; top: 4px; right: 8px;
+                      color: var(--perigo); font-size: 15px; text-shadow: 0 0 4px #000; }
+  .foto.salva { outline-color: var(--ok); }
+  .foto.estrela { outline-color: var(--acento); }
+  .foto.estrela::before { content: "★"; position: absolute; top: 4px; right: 7px; color: var(--acento);
+                          z-index: 1; text-shadow: 0 0 4px #000; }
+  .foto .play { position: absolute; left: 6px; bottom: 4px; font-size: 12px; text-shadow: 0 0 4px #000; }
+  .foto .nota { position: absolute; left: 6px; top: 4px; font-size: 11px; color: #fff;
+                text-shadow: 0 0 4px #000; opacity: 0; transition: opacity .15s; }
+  .foto:hover .nota { opacity: .9; }
+  .bloco { margin-bottom: 44px; }
+  .momentos { display: flex; flex-wrap: wrap; gap: 0 40px; }
+  .momentos .bloco { max-width: 100%; }
+  .momentos .grade { grid-template-columns: repeat(var(--cols), var(--lado)); }
+  .bloco h2 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+  .bloco .sub { color: var(--suave); font-size: 13px; margin: 0 0 12px; }
+  .rajada { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .rajada .foto { width: var(--lado); }
+  .pessoas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .pessoa { background: var(--cartao); border-radius: 12px; padding: 16px; display: flex; gap: 14px; }
+  .pessoa .capa { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; flex: none; }
+  .pessoa .info { flex: 1; min-width: 0; }
+  .pessoa input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--linha);
+                  color: var(--texto); font: inherit; padding: 4px 0; outline: none; }
+  .pessoa input:focus { border-color: var(--acento); }
+  .pessoa .faces { display: flex; gap: 4px; margin-top: 10px; overflow: hidden; }
+  .pessoa .faces img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+  .pessoa .meta { display: flex; justify-content: space-between; color: var(--suave); font-size: 12px; margin-top: 8px; }
+  .pessoa button { background: none; border: 0; color: var(--suave); font: inherit; font-size: 12px; cursor: pointer; padding: 0; }
+  .pessoa button:hover { color: var(--perigo); }
+  .pessoa.ignorada { opacity: .35; }
+  .rodape { position: fixed; left: 0; right: 0; bottom: 0; padding: 18px 32px; display: flex; gap: 16px;
+            align-items: center; background: linear-gradient(transparent, var(--fundo) 40%); }
+  .rodape .resumo { color: var(--suave); font-size: 13px; }
+  .btn { background: var(--acento); color: #111; border: 0; border-radius: 10px; padding: 12px 22px;
+         font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.leve { background: var(--cartao); color: var(--texto); font-weight: 400; }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .vazio { color: var(--suave); padding: 80px 0; text-align: center; }
+  .caixa { position: fixed; inset: 0; background: rgba(0,0,0,.94); z-index: 20; display: none;
+           align-items: center; justify-content: center; }
+  .caixa.aberta { display: flex; }
+  .caixa img, .caixa video { max-width: 92vw; max-height: 86vh; border-radius: 6px; }
+  .caixa .legenda { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: var(--suave); font-size: 13px; }
+  .caixa .estado { position: absolute; top: 20px; left: 0; right: 0; text-align: center; font-size: 14px; }
+  .menu { position: absolute; right: 32px; top: 100%; background: var(--cartao); border-radius: 10px;
+          padding: 6px; display: none; flex-direction: column; min-width: 180px; }
+  .menu.aberto { display: flex; }
+  .menu button { text-align: left; }
+  @media (max-width: 640px) { header, main, .rodape { padding-left: 16px; padding-right: 16px; } :root { --lado: 104px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="topo"><h1>Limpeza</h1><span class="progresso" id="progresso"></span></div>
+  <nav id="abas">
+    <button data-aba="lixo">Lixo<small></small></button>
+    <button data-aba="repetidas">Repetidas<small></small></button>
+    <button data-aba="momentos">Momentos<small></small></button>
+    <button data-aba="destaques">Destaques</button>
+    <button data-aba="pessoas">Pessoas<small></small></button>
+    <button class="mais" id="mais">Mais opções</button>
+  </nav>
+  <div class="menu" id="menu">
+    <button data-aba="baixada">Imagens baixadas<small></small></button>
+    <button data-aba="documento">Documentos<small></small></button>
+  </div>
+  <div class="barra"><i id="barra"></i></div>
+</header>
+
+<main id="conteudo"></main>
+
+<div class="rodape" id="rodape">
+  <button class="btn" id="confirmar">Confirmar</button>
+  <button class="btn leve" id="desfazer" hidden>Desfazer</button>
+  <span class="resumo" id="resumoPagina"></span>
+</div>
+
+<div class="caixa" id="caixa">
+  <div class="estado" id="caixaEstado"></div>
+  <div id="caixaMidia"></div>
+  <div class="legenda">← → navegar · X tira/volta · D destaque · Esc fecha</div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = (url, corpo) => fetch(url, corpo ? {method: "POST", headers: {"Content-Type": "application/json"},
+  body: JSON.stringify(corpo)} : undefined).then(r => r.json());
+
+const TEXTOS = {
+  lixo: "Tudo aqui vai para o lixo. Clique no que você quer salvar.",
+  baixada: "Imagens que não saíram da sua câmera. Ficam guardadas à parte. Clique no que é lixo.",
+  documento: "Documentos ficam guardados à parte, fora da galeria. Clique no que é lixo.",
+  repetidas: "Em cada grupo fica só a marcada. Clique para trocar, ou para manter mais de uma.",
+  momentos: "Clique tira a foto. Shift + clique marca como destaque.",
+  destaques: "Candidatas a destaque do Instagram, por tema. Clique para escolher ou tirar.",
+  pessoas: "Dê nome a quem importa. Mesmo nome em dois grupos junta as pessoas.",
+};
+
+let aba = location.hash.slice(1) || localStorage.getItem("aba") || "lixo";
+let estado = {};      // id -> decisão que será gravada
+let ordem = [];       // ids na ordem da tela (para a caixa)
+let tipos = {};       // id -> foto | video
+let ultimo = null;    // ids da última confirmação (desfazer)
+
+function foto(id, tipo, classe, nota) {
+  tipos[id] = tipo; ordem.push(id);
+  return `<div class="foto ${classe}" data-id="${id}">
+    <img loading="lazy" src="/mini/${id}">
+    ${tipo === "video" ? '<span class="play">▶</span>' : ""}
+    ${nota != null ? `<span class="nota">${nota.toFixed(1)}</span>` : ""}</div>`;
+}
+
+function classeDe(dec, padrao) {
+  if (dec === "lixo") return "fora";
+  if (dec === "destaque") return "estrela";
+  if (padrao === "lixo" && dec === "manter") return "salva";
+  return "";
+}
+
+function pintar(id) {
+  const el = document.querySelector(`.foto[data-id="${id}"]`);
+  if (!el) return;
+  el.className = "foto " + classeDe(estado[id], el.dataset.padrao);
+}
+
+function dataBR(ts) {
+  return new Date(ts * 1000).toLocaleDateString("pt-BR", {weekday: "short", day: "numeric", month: "short", year: "numeric"});
+}
+
+// ── abas ───────────────────────────────────────────────────────────
+async function carregarResumo() {
+  const r = await api("/api/resumo");
+  const n = {lixo: r.lixo, repetidas: r.repetidas, momentos: r.momentos, pessoas: r.pessoas,
+             baixada: r.baixada, documento: r.documento};
+  document.querySelectorAll("[data-aba]").forEach(b => {
+    const s = b.querySelector("small");
+    if (s) s.textContent = n[b.dataset.aba] ? n[b.dataset.aba] : "";
+    b.classList.toggle("ativa", b.dataset.aba === aba);
+  });
+  $("#progresso").textContent = `${r.feitas.toLocaleString("pt-BR")} de ${r.total.toLocaleString("pt-BR")} decididas`;
+  $("#barra").style.width = (100 * r.feitas / r.total) + "%";
+}
+
+async function abrir(nova) {
+  aba = nova; localStorage.setItem("aba", aba);
+  estado = {}; ordem = []; tipos = {};
+  $("#menu").classList.remove("aberto");
+  carregarResumo();
+  const c = $("#conteudo");
+  c.innerHTML = `<p class="dica">${TEXTOS[aba]}</p><div class="vazio">Carregando…</div>`;
+  const html = await ({lixo: triagem, baixada: triagem, documento: triagem, repetidas, momentos,
+                       destaques, pessoas})[aba]();
+  c.innerHTML = `<p class="dica">${TEXTOS[aba]}</p>` + (html || '<div class="vazio">Nada pendente aqui.</div>');
+  $("#rodape").style.display = aba === "pessoas" ? "none" : "flex";
+  atualizarRodape();
+}
+
+async function triagem() {
+  const itens = await api("/api/triagem/" + aba);
+  if (!itens.length) return "";
+  itens.forEach(i => estado[i.id] = aba);
+  const padrao = aba === "lixo" ? "lixo" : aba;
+  return `<div class="grade">${itens.map(i => foto(i.id, i.tipo, classeDe(estado[i.id], padrao), i.nota)
+    .replace('class="foto', `data-padrao="${padrao}" class="foto`)).join("")}</div>`;
+}
+
+async function repetidas() {
+  const grupos = await api("/api/repetidas");
+  if (!grupos.length) return "";
+  return grupos.map(g => `<div class="rajada">${g.itens.map(i => {
+    const proprio = ["destaque", "baixada", "documento", "lixo"].includes(i.destino);
+    estado[i.id] = i.melhor ? (proprio ? i.destino : "manter") : "lixo";
+    return foto(i.id, i.tipo, classeDe(estado[i.id]), i.nota);
+  }).join("")}</div>`).join("");
+}
+
+async function momentos() {
+  const lista = await api("/api/momentos");
+  if (!lista.length) return "";
+  return '<div class="momentos">' + lista.map(m => {
+    const lugar = m.cidade ? " · " + m.cidade : "";
+    const gente = m.pessoas.length ? " · " + m.pessoas.join(", ") : "";
+    const grade = m.itens.map(i => {
+      estado[i.id] = i.destino === "destaque" ? "destaque" : "manter";
+      return foto(i.id, i.tipo, classeDe(estado[i.id]), i.nota);
+    }).join("");
+    const titulo = m.id === 0 ? "Sem data" : dataBR(m.inicio) + lugar;
+    const n = m.itens.length;
+    return `<section class="bloco"><h2>${titulo}</h2>
+      <p class="sub">${n} ${n === 1 ? "foto" : "fotos"}${gente}</p>
+      <div class="grade" style="--cols:${Math.min(n, 8)}">${grade}</div></section>`;
+  }).join("") + "</div>";
+}
+
+async function destaques() {
+  const temas = await api("/api/destaques");
+  const nomes = Object.keys(temas);
+  if (!nomes.length) return "";
+  return nomes.map(t => {
+    const grade = temas[t].map(i => {
+      estado[i.id] = i.efetivo === "destaque" ? "destaque" : "manter";
+      return foto(i.id, i.tipo, classeDe(estado[i.id]), i.nota);
+    }).join("");
+    return `<section class="bloco"><h2>${t}</h2><p class="sub" data-tema="${t}"></p>
+      <div class="grade">${grade}</div></section>`;
+  }).join("");
+}
+
+async function pessoas() {
+  const lista = await api("/api/pessoas");
+  if (!lista.length) return "";
+  return `<div class="pessoas">${lista.map(p => `
+    <div class="pessoa ${p.nome === "__ignorar" ? "ignorada" : ""}" data-pessoa="${p.id}">
+      <img class="capa" src="/rosto/${p.capa_rosto}">
+      <div class="info">
+        <input placeholder="Quem é?" value="${p.nome && p.nome !== "__ignorar" ? p.nome : ""}">
+        <div class="faces">${p.amostra.map(r => `<img loading="lazy" src="/rosto/${r}">`).join("")}</div>
+        <div class="meta"><span>${p.n} fotos</span><button data-ignorar>Não é pessoa</button></div>
+      </div>
+    </div>`).join("")}</div>`;
+}
+
+// ── interação ──────────────────────────────────────────────────────
+function alternar(id, destaque) {
+  const atual = estado[id];
+  const padrao = document.querySelector(`.foto[data-id="${id}"]`)?.dataset.padrao;
+  if (destaque) estado[id] = atual === "destaque" ? "manter" : "destaque";
+  else if (padrao === "lixo") estado[id] = atual === "lixo" ? "manter" : "lixo";
+  else if (padrao) estado[id] = atual === "lixo" ? padrao : "lixo";
+  else if (aba === "destaques") estado[id] = atual === "destaque" ? "manter" : "destaque";
+  else estado[id] = atual === "lixo" ? "manter" : "lixo";
+  pintar(id); atualizarRodape();
+}
+
+function atualizarRodape() {
+  const v = Object.values(estado);
+  const n = k => v.filter(x => x === k).length;
+  const partes = [];
+  if (n("manter")) partes.push(`${n("manter")} ficam`);
+  if (n("destaque")) partes.push(`${n("destaque")} destaques`);
+  if (n("baixada")) partes.push(`${n("baixada")} baixadas`);
+  if (n("documento")) partes.push(`${n("documento")} documentos`);
+  if (n("lixo")) partes.push(`${n("lixo")} para o lixo`);
+  $("#resumoPagina").textContent = partes.join(" · ");
+  $("#confirmar").disabled = !v.length;
+  $("#confirmar").textContent = aba === "destaques" ? "Salvar escolhas" : "Confirmar e seguir";
+  $("#desfazer").hidden = !ultimo;
+  document.querySelectorAll("[data-tema]").forEach(p => {
+    const grade = p.nextElementSibling;
+    const k = [...grade.querySelectorAll(".foto")].filter(f => estado[f.dataset.id] === "destaque").length;
+    p.textContent = `${k} escolhida${k === 1 ? "" : "s"}`;
+  });
+}
+
+async function confirmar() {
+  if (!Object.keys(estado).length) return;
+  $("#confirmar").disabled = true;
+  await api("/api/decidir", {itens: estado});
+  ultimo = Object.keys(estado);
+  window.scrollTo(0, 0);
+  abrir(aba);
+}
+
+async function desfazer() {
+  if (!ultimo) return;
+  await api("/api/desfazer", {ids: ultimo});
+  ultimo = null;
+  abrir(aba);
+}
+
+$("#conteudo").addEventListener("click", e => {
+  const f = e.target.closest(".foto");
+  if (f) return alternar(+f.dataset.id, e.shiftKey);
+  if (e.target.matches("[data-ignorar]")) {
+    const card = e.target.closest(".pessoa");
+    const ign = !card.classList.contains("ignorada");
+    card.classList.toggle("ignorada", ign);
+    api("/api/pessoa", {id: +card.dataset.pessoa, nome: ign ? "__ignorar" : ""});
+  }
+});
+$("#conteudo").addEventListener("dblclick", e => {
+  const f = e.target.closest(".foto");
+  if (f) verGrande(+f.dataset.id);
+});
+$("#conteudo").addEventListener("change", e => {
+  const card = e.target.closest(".pessoa");
+  if (card) api("/api/pessoa", {id: +card.dataset.pessoa, nome: e.target.value}).then(carregarResumo);
+});
+
+// ── caixa (foto grande) ────────────────────────────────────────────
+let naCaixa = null;
+function verGrande(id) {
+  naCaixa = id;
+  $("#caixaMidia").innerHTML = tipos[id] === "video"
+    ? `<video src="/grande/${id}" controls autoplay></video>` : `<img src="/grande/${id}">`;
+  const e = estado[id];
+  $("#caixaEstado").innerHTML = e === "lixo" ? '<span style="color:var(--perigo)">vai para o lixo</span>'
+    : e === "destaque" ? '<span style="color:var(--acento)">★ destaque</span>' : "";
+  $("#caixa").classList.add("aberta");
+}
+function fecharCaixa() { $("#caixa").classList.remove("aberta"); $("#caixaMidia").innerHTML = ""; naCaixa = null; }
+$("#caixa").addEventListener("click", e => { if (e.target.id === "caixa") fecharCaixa(); });
+
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (naCaixa != null) {
+    const i = ordem.indexOf(naCaixa);
+    if (e.key === "Escape") fecharCaixa();
+    else if (e.key === "ArrowRight" && i < ordem.length - 1) verGrande(ordem[i + 1]);
+    else if (e.key === "ArrowLeft" && i > 0) verGrande(ordem[i - 1]);
+    else if (e.key.toLowerCase() === "x") { alternar(naCaixa, false); verGrande(naCaixa); }
+    else if (e.key.toLowerCase() === "d") { alternar(naCaixa, true); verGrande(naCaixa); }
+    return;
+  }
+  if (e.key === "Enter" && aba !== "pessoas") confirmar();
+  if (e.key.toLowerCase() === "z" && (e.ctrlKey || e.metaKey)) desfazer();
+});
+
+document.querySelectorAll("[data-aba]").forEach(b => b.addEventListener("click", () => abrir(b.dataset.aba)));
+$("#mais").addEventListener("click", () => $("#menu").classList.toggle("aberto"));
+$("#confirmar").addEventListener("click", confirmar);
+$("#desfazer").addEventListener("click", desfazer);
+abrir(aba);
+</script>
+</body>
+</html>

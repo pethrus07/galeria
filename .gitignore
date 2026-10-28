@@ -1,0 +1,13 @@
+# página pessoal (de casal), com senha: não é parte do estudo e não vai para o git
+stela/
+__pycache__/
+*.pyc
+# acervo, banco e modelos ficam em ~/Fotos-Projeto, fora desta pasta; por garantia:
+*.db
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.mp4
+*.onnx
+*.pth
