@@ -11,7 +11,17 @@ cada uma numa notação padrão:
 
 Estudo de reconhecimento de imagem com IA local: uma esteira em Python inventaria o acervo, acha cópias, extrai sinais na GPU uma vez (CLIP, estética LAION, InsightFace) e classifica sem GPU. Tudo na máquina; a galeria online não foi feita.
 
-![Estudo de caso · Galeria com IA local](./galeria-pessoal.svg)
+### Quem usa e para quê (UML)
+
+![Casos de uso · Estudo de caso · Galeria com IA local](./galeria-pessoal-1-casos-de-uso.svg)
+
+### Do acervo novo à mídia classificada (BPMN 2.0)
+
+![Processo · Estudo de caso · Galeria com IA local](./galeria-pessoal-2-processo.svg)
+
+### Arquitetura (C4, containers)
+
+![Arquitetura · Estudo de caso · Galeria com IA local](./galeria-pessoal-3-arquitetura.svg)
 
 Editável: [`galeria-pessoal.excalidraw`](./galeria-pessoal.excalidraw), abre em [excalidraw.com](https://excalidraw.com) ou no VS Code com a extensão Excalidraw.
 
