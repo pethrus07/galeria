@@ -62,4 +62,4 @@ página pessoal feita com o mesmo acervo não é parte do estudo e fica fora do 
 
 ## Licença
 
-Todos os direitos reservados.
+MIT. Veja [LICENSE](LICENSE).

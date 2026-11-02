@@ -62,4 +62,4 @@ personal page built from the same collection is not part of the study and stays 
 
 ## License
 
-All rights reserved.
+MIT. See [LICENSE](LICENSE).
