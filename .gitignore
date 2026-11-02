@@ -11,3 +11,9 @@ __pycache__/
 *.mp4
 *.onnx
 *.pth
+*.webp
+*.gif
+*.mov
+*.npy
+*.npz
+*.pkl
