@@ -1,11 +1,15 @@
-# Local AI photo gallery (case study)
+# Galeria
 
 English · [Português](README.pt-BR.md)
 
-**Archived (2026-11).** Case study finished on 2026-10-28. The online gallery never existed; what remains is the
+Local AI photo gallery (case study).
+
+## Status
+
+Archived (November 2026). Case study finished on 2026-10-28. The online gallery never existed; what remains is the
 analysis pipeline and a local review screen.
 
-## What it was
+## What it does
 
 A personal photo collection (a Google Takeout with 7,100 files, 16.3 GB, 6,284 unique) classified entirely on this
 machine, on the GPU, with nothing sent out: who appears, where, in which moment, which is the best shot of a
@@ -50,15 +54,15 @@ sheets, people, timeline, recognition diagnosis).
 Python 3.12, PyTorch with CUDA (RTX 3050 Ti, 4 GB), open_clip, onnxruntime, InsightFace, OpenCV, scikit-learn,
 reverse_geocoder, SQLite, Flask.
 
-## Data
+## Architecture
+
+[docs/arquitetura/](docs/arquitetura/README.md): use cases, process and containers.
+
+## Decisions and known limits
 
 No photo, face, embedding or database goes into git. The collection, the database (`galeria.db`) and the models live
 in a folder outside the repository, and `.gitignore` blocks images, video, `.db` and model weights just in case. A
 personal page built from the same collection is not part of the study and stays out of git.
-
-## Architecture
-
-[docs/arquitetura/](docs/arquitetura/README.md): use cases, process and containers.
 
 ## License
 

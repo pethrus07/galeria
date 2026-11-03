@@ -1,11 +1,15 @@
-# Galeria com IA local (estudo de caso)
+# Galeria
 
 [English](README.md) · Português
 
-**Arquivado (11/2026).** Estudo de caso concluído em 28/10/2026. A galeria online nunca existiu; o que ficou
+Galeria com IA local (estudo de caso).
+
+## Status
+
+Arquivado (novembro de 2026). Estudo de caso concluído em 28/10/2026. A galeria online nunca existiu; o que ficou
 é a esteira de análise e uma tela local de revisão.
 
-## O que foi
+## O que faz
 
 Um acervo pessoal de fotos (um Google Takeout com 7.100 arquivos, 16,3 GB, 6.284 únicos) classificado inteiro
 nesta máquina, na GPU, sem mandar nada para fora: quem aparece, onde, em que momento, qual é a melhor de uma
@@ -50,15 +54,15 @@ conferência (folhas de contato, pessoas, linha do tempo, diagnóstico de reconh
 Python 3.12, PyTorch com CUDA (RTX 3050 Ti, 4 GB), open_clip, onnxruntime, InsightFace, OpenCV, scikit-learn,
 reverse_geocoder, SQLite, Flask.
 
-## Dados
+## Arquitetura
+
+[docs/arquitetura/](docs/arquitetura/README.md): casos de uso, processo e containers.
+
+## Decisões e limites conhecidos
 
 Nada de foto, rosto, embedding ou banco entra no git. O acervo, o banco (`galeria.db`) e os modelos ficam numa
 pasta fora do repositório, e o `.gitignore` bloqueia imagem, vídeo, `.db` e pesos de modelo por garantia. Uma
 página pessoal feita com o mesmo acervo não é parte do estudo e fica fora do git.
-
-## Arquitetura
-
-[docs/arquitetura/](docs/arquitetura/README.md): casos de uso, processo e containers.
 
 ## Licença
 
